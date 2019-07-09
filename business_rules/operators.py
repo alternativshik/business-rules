@@ -1,10 +1,10 @@
 import inspect
 import re
+from decimal import Decimal
 from functools import wraps
 
-from .fields import FIELD_TEXT, FIELD_NUMERIC, FIELD_NO_INPUT, FIELD_SELECT, FIELD_SELECT_MULTIPLE
+from .fields import FIELD_NO_INPUT, FIELD_NUMERIC, FIELD_SELECT, FIELD_SELECT_MULTIPLE, FIELD_TEXT
 from .utils import fn_name_to_pretty_label
-from decimal import Decimal
 
 
 class BaseType(object):
@@ -22,12 +22,6 @@ class BaseType(object):
             for m in methods
             if getattr(m[1], 'is_operator', False)
         ]
-
-
-def export_type(cls):
-    """ Decorator to expose the given class to business_rules.export_rule_data. """
-    cls.export_in_rule_data = True
-    return cls
 
 
 def type_operator(input_type, label=None, assert_type_for_arguments=True):
@@ -55,9 +49,7 @@ def type_operator(input_type, label=None, assert_type_for_arguments=True):
     return wrapper
 
 
-@export_type
 class StringType(BaseType):
-
     name = "string"
 
     def _assert_valid_value_and_cast(self, value):
@@ -95,7 +87,6 @@ class StringType(BaseType):
         return bool(self.value)
 
 
-@export_type
 class NumericType(BaseType):
     EPSILON = Decimal('0.000001')
 
@@ -132,9 +123,7 @@ class NumericType(BaseType):
         return self.less_than(other_numeric) or self.equal_to(other_numeric)
 
 
-@export_type
 class BooleanType(BaseType):
-
     name = "boolean"
 
     def _assert_valid_value_and_cast(self, value):
@@ -151,9 +140,7 @@ class BooleanType(BaseType):
         return not self.value
 
 
-@export_type
 class SelectType(BaseType):
-
     name = "select"
 
     def _assert_valid_value_and_cast(self, value):
@@ -183,9 +170,7 @@ class SelectType(BaseType):
         return True
 
 
-@export_type
 class SelectMultipleType(BaseType):
-
     name = "select_multiple"
 
     def _assert_valid_value_and_cast(self, value):
